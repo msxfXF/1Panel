@@ -38,7 +38,6 @@ export interface GlobalState {
     isOnRestart: boolean;
     agreeLicense: boolean;
     hasNewVersion: boolean;
-    ignoreCaptcha: boolean;
     device: DeviceType;
     lastFilePath: string;
     currentDB: string;

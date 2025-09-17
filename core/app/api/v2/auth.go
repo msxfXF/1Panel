@@ -26,11 +26,9 @@ func (b *BaseApi) Login(c *gin.Context) {
 		return
 	}
 
-	if !req.IgnoreCaptcha {
-		if errMsg := captcha.VerifyCode(req.CaptchaID, req.Captcha); errMsg != "" {
-			helper.BadAuth(c, errMsg, nil)
-			return
-		}
+	if errMsg := captcha.VerifyCode(req.CaptchaID, req.Captcha); errMsg != "" {
+		helper.BadAuth(c, errMsg, nil)
+		return
 	}
 	entranceItem := c.Request.Header.Get("EntranceCode")
 	var entrance []byte
