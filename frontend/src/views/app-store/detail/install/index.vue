@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup name="AppInstallPage">
-import { ref, reactive } from 'vue';
+import { ref, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import AppInstallForm from '@/views/app-store/detail/form/index.vue';
 import { installApp } from '@/api/modules/app';
@@ -32,7 +32,7 @@ const loading = ref(false);
 const installFormRef = ref<InstanceType<typeof AppInstallForm>>();
 const taskLogRef = ref();
 
-const formData = reactive({
+const createDefaultFormData = () => ({
     appDetailId: 0,
     params: {},
     name: '',
@@ -51,6 +51,8 @@ const formData = reactive({
     gpuConfig: false,
     specifyIP: '',
 });
+
+const formData = ref(createDefaultFormData());
 
 const handleClose = () => {
     open.value = false;

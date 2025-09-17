@@ -96,7 +96,7 @@
                             ></el-input>
                         </el-form-item>
                         <el-row :gutter="10">
-                            <el-col :span="12" v-if="!globalStore.ignoreCaptcha">
+                            <el-col :span="12">
                                 <el-form-item prop="captcha">
                                     <el-input
                                         v-model.trim="loginForm.captcha"
@@ -105,7 +105,7 @@
                                     ></el-input>
                                 </el-form-item>
                             </el-col>
-                            <el-col :span="12" v-if="!globalStore.ignoreCaptcha">
+                            <el-col :span="12">
                                 <img
                                     class="w-full h-10"
                                     v-if="captcha.imagePath"
@@ -220,7 +220,6 @@ const loginFormRef = ref<FormInstance>();
 const loginForm = reactive({
     name: '',
     password: '',
-    ignoreCaptcha: true,
     captcha: '',
     captchaID: '',
     authMethod: 'session',
@@ -231,6 +230,7 @@ const loginForm = reactive({
 const loginRules = reactive({
     name: [{ required: true, validator: checkUsername, trigger: 'blur' }],
     password: [{ required: true, validator: checkPassword, trigger: 'blur' }],
+    captcha: [{ required: true, message: i18n.t('commons.login.errorCaptcha'), trigger: 'blur' }],
     agreeLicense: [{ required: true, validator: checkAgreeLicense, trigger: 'blur' }],
 });
 
@@ -324,13 +324,12 @@ const login = (formEl: FormInstance | undefined) => {
         let requestLoginForm = {
             name: loginForm.name,
             password: encryptPassword(loginForm.password),
-            ignoreCaptcha: globalStore.ignoreCaptcha,
             captcha: loginForm.captcha,
             captchaID: captcha.captchaID,
             authMethod: 'session',
             language: loginForm.language,
         };
-        if (!globalStore.ignoreCaptcha && requestLoginForm.captcha == '') {
+        if (requestLoginForm.captcha == '') {
             errCaptcha.value = true;
             return;
         }
@@ -338,7 +337,6 @@ const login = (formEl: FormInstance | undefined) => {
             isLoggingIn = true;
             loading.value = true;
             const res = await loginApi(requestLoginForm);
-            globalStore.ignoreCaptcha = true;
             if (res.data.mfaStatus === 'Enable') {
                 mfaShow.value = true;
                 errMfaInfo.value = false;
@@ -365,7 +363,6 @@ const login = (formEl: FormInstance | undefined) => {
                     return;
                 }
                 if (res.message === 'ErrAuth') {
-                    globalStore.ignoreCaptcha = false;
                     errCaptcha.value = false;
                     errAuthInfo.value = true;
                     loginVerify();
@@ -477,9 +474,7 @@ onMounted(() => {
     globalStore.isOnRestart = false;
     getSetting();
     getXpackSettingForTheme();
-    if (!globalStore.ignoreCaptcha) {
-        loginVerify();
-    }
+    loginVerify();
     document.title = globalStore.themeConfig.panelName;
     loginBtnLinkColor.value = globalStore.themeConfig.loginBtnLinkColor || '#005eeb';
     document.documentElement.style.setProperty('--login-btn-link-color', loginBtnLinkColor.value);
