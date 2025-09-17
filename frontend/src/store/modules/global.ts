@@ -33,7 +33,6 @@ const GlobalStore = defineStore({
         isOnRestart: false,
         agreeLicense: false,
         hasNewVersion: false,
-        ignoreCaptcha: true,
         device: DeviceType.Desktop,
         lastFilePath: '',
         currentDB: '',
